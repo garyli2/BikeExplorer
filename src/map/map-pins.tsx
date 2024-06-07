@@ -12,6 +12,19 @@ import { fetchNetwork, fetchNetworks } from "../queryFns";
 import { memo } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 
+const StationIcon = ({ station }: { station: NetworkStation }) => {
+  let color: "success" | "warning" | "error";
+  if (station.free_bikes && station.empty_slots) {
+    color = "success";
+  } else if (station.free_bikes || station.empty_slots) {
+    color = "warning";
+  } else {
+    color = "error";
+  }
+
+  return <PlaceIcon color={color} />;
+};
+
 const MapPins = memo(() => {
   const isNetworkSelected = useAppSelector(selectIsNetworkSelected);
   const selectedNetwork = useAppSelector(selectSelectedNetwork);
@@ -45,7 +58,7 @@ const MapPins = memo(() => {
               dispatch(setPopupInfo(station));
             }}
           >
-            <PlaceIcon />
+            <StationIcon station={station} />
           </Marker>
         ))}
       </>
