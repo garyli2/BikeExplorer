@@ -12,6 +12,8 @@ import { fetchNetwork, fetchNetworks } from "../queryFns";
 import { memo } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 
+import { isNil } from "lodash";
+
 const StationIcon = ({ station }: { station: NetworkStation }) => {
   let color: "success" | "warning" | "error";
   if (station.free_bikes && station.empty_slots) {
@@ -68,22 +70,31 @@ const MapPins = memo(() => {
   const networks: NetworkModel[] = networksData?.networks ?? [];
   return (
     <>
-      {networks.map((network) => (
-        <Marker
-          key={network.id}
-          longitude={network.location.longitude}
-          latitude={network.location.latitude}
-          anchor="bottom"
-          onClick={(e) => {
-            // If we let the click event propagates to the map, it will immediately close the popup
-            // with `closeOnClick: true`
-            e.originalEvent.stopPropagation();
-            dispatch(setPopupInfo(network));
-          }}
-        >
-          <PedalBike />
-        </Marker>
-      ))}
+      {networks.map((network) => {
+        if (
+          isNil(network?.location?.longitude) ||
+          isNil(network?.location?.latitude)
+        ) {
+          console.warn("Network does not have proper location!", network);
+          return;
+        }
+        return (
+          <Marker
+            key={network.id}
+            longitude={network.location.longitude}
+            latitude={network.location.latitude}
+            anchor="bottom"
+            onClick={(e) => {
+              // If we let the click event propagates to the map, it will immediately close the popup
+              // with `closeOnClick: true`
+              e.originalEvent.stopPropagation();
+              dispatch(setPopupInfo(network));
+            }}
+          >
+            <PedalBike />
+          </Marker>
+        );
+      })}
     </>
   );
 });
