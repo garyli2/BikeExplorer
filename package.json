@@ -58,6 +58,7 @@
     "@tanstack/react-query": "^5.40.0",
     "@types/react-window": "^1.8.8",
     "@uidotdev/usehooks": "^2.4.1",
+    "dayjs": "^1.11.11",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^9.0.0",
     "mapbox-gl": "^3.4.0",

@@ -17,4 +17,9 @@ export type NetworkStation = {
   longitude: number;
   free_bikes: number;
   empty_slots: number;
+  extra?: {
+    has_ebikes?: boolean;
+    ebikes?: number;
+  };
+  timestamp: string;
 };

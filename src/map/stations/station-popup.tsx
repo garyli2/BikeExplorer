@@ -1,16 +1,13 @@
-import {
-  Divider,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Divider, Grid, Tooltip, Typography } from "@mui/material";
 import { Popup } from "react-map-gl/maplibre";
-import {
-  selectPopupInfo,
-  setPopupInfo,
-} from "../../store/networks";
+import { selectPopupInfo, setPopupInfo } from "../../store/networks";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import type { NetworkStation } from "../../models";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 const StatusIcon = ({ data }: { data: number }) => {
   return data ? (
@@ -18,6 +15,14 @@ const StatusIcon = ({ data }: { data: number }) => {
   ) : (
     <CancelIcon color="error" />
   );
+};
+
+const getEbikes = (station: NetworkStation) => {
+  return station?.extra?.ebikes;
+};
+
+const hasEbikes = (station: NetworkStation) => {
+  return station?.extra?.has_ebikes || getEbikes(station) !== undefined;
 };
 
 const StationPopup = () => {
@@ -36,32 +41,55 @@ const StationPopup = () => {
         dispatch(setPopupInfo(null));
       }}
     >
-      <Grid container spacing={2} padding={1}>
-        <Grid item xs={12}>
-          <Typography textAlign="center" fontWeight="bold">
+      <Grid container padding={1}>
+        <Grid item xs={12} marginBottom={1}>
+          <Typography textAlign="center" variant="body1">
             {popupInfo.name}
           </Typography>
           <Divider />
         </Grid>
         {/* Free bikes */}
         <Grid item xs={6}>
-          <Typography>Free bikes</Typography>
+          <Typography textAlign="right">Free bikes</Typography>
         </Grid>
         <Grid item xs={3}>
-          <Typography>{popupInfo.free_bikes}</Typography>
+          <Typography textAlign="right">{popupInfo.free_bikes}</Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} paddingLeft={1}>
           <StatusIcon data={popupInfo.free_bikes} />
         </Grid>
+
         {/* Free bikes */}
         <Grid item xs={6}>
-          <Typography>Empty Slots</Typography>
+          <Typography textAlign="right">Empty Slots</Typography>
         </Grid>
         <Grid item xs={3}>
-          <Typography>{popupInfo.empty_slots}</Typography>
+          <Typography textAlign="right">{popupInfo.empty_slots}</Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} paddingLeft={1}>
           <StatusIcon data={popupInfo.empty_slots} />
+        </Grid>
+
+        {hasEbikes(popupInfo) && (
+          <>
+            <Grid item xs={6}>
+              <Typography textAlign="right">E-bikes</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography textAlign="right">{getEbikes(popupInfo)}</Typography>
+            </Grid>
+            <Grid item xs={3} paddingLeft={1}>
+              <StatusIcon data={getEbikes(popupInfo)} />
+            </Grid>
+          </>
+        )}
+
+        <Grid item xs={12}>
+          <Tooltip title={popupInfo.timestamp} placement="bottom-end">
+            <Typography textAlign="right" variant="caption" display="block">
+              {dayjs(popupInfo.timestamp).fromNow()}
+            </Typography>
+          </Tooltip>
         </Grid>
       </Grid>
     </Popup>
