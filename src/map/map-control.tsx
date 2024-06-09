@@ -2,8 +2,11 @@ import {
   Box,
   Button,
   CircularProgress,
+  Fab,
+  IconButton,
   Input,
   InputAdornment,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +19,7 @@ import {
   selectIsNetworkSelected,
   selectSearchTerm,
   selectSelectedNetwork,
+  setIsControlOpen,
   setSearchTerm,
   setSelectedNetwork,
 } from "../store/networks";
@@ -24,6 +28,7 @@ import { NetworkModel, NetworkStation } from "../models";
 import NetworkListItem from "./networks/networks-list-item";
 import StationsListItem from "./stations/stations-list-item";
 import { useMap } from "react-map-gl";
+import CloseIcon from "@mui/icons-material/Close";
 
 const getNetworkSearchKey = (network: NetworkModel) =>
   `${network.name ?? ""}${network.location?.city ?? "Unknown city"}, ${
@@ -79,7 +84,18 @@ const MapControl = () => {
   }
 
   if (networksError || stationsError) {
-    return <h1>Error loading!</h1>;
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={3}
+        height={height - 400}
+      >
+        <Typography>Error Loading!</Typography>
+      </Box>
+    );
   }
 
   let arr: NetworkStation[] | NetworkModel[] = [];
@@ -120,18 +136,23 @@ const MapControl = () => {
           {isNetworkSelected ? selectedNetwork.name : "Select a bike network"}
         </Typography>
         {isNetworkSelected && (
-          <Button
-            variant="contained"
-            startIcon={<Logout />}
-            onClick={() => {
-              map.current.flyTo({ center: [0, 0], zoom: 1 });
-              dispatch(setSearchTerm(""));
-              dispatch(setSelectedNetwork(null));
-            }}
-          >
-            Back
-          </Button>
+          <Tooltip title="Choose another network">
+            <IconButton
+              onClick={() => {
+                map.current.flyTo({ center: [0, 0], zoom: 1 });
+                dispatch(setSearchTerm(""));
+                dispatch(setSelectedNetwork(null));
+              }}
+            >
+              <Logout />
+            </IconButton>
+          </Tooltip>
         )}
+        <Tooltip title="Close the control panel">
+          <IconButton onClick={() => dispatch(setIsControlOpen(false))}>
+            <CloseIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
       <Input
         placeholder={

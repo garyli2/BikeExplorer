@@ -11,12 +11,14 @@ export interface NetworkStore {
   };
   popupInfo: NetworkModel | NetworkStation;
   searchTerm: string;
+  isControlOpen: boolean;
 }
 
 const initialState: NetworkStore = {
   selectedNetwork: null,
   popupInfo: null,
-  searchTerm: ""
+  searchTerm: "",
+  isControlOpen: true,
 };
 
 export const networkSlice = createSlice({
@@ -45,16 +47,21 @@ export const networkSlice = createSlice({
     ) => {
       state.popupInfo = action.payload;
     },
-    setSearchTerm: (
-      state,
-      action: PayloadAction<string>
-    ) => {
+    setSearchTerm: (state, action: PayloadAction<string>) => {
       state.searchTerm = action.payload;
+    },
+    setIsControlOpen: (state, action: PayloadAction<boolean>) => {
+      state.isControlOpen = action.payload;
     },
   },
 });
 
-export const { setSelectedNetwork, setPopupInfo, setSearchTerm } = networkSlice.actions;
+export const {
+  setSelectedNetwork,
+  setPopupInfo,
+  setSearchTerm,
+  setIsControlOpen,
+} = networkSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectSelectedNetwork = (state: RootState) =>
@@ -63,5 +70,7 @@ export const selectIsNetworkSelected = (state: RootState) =>
   state.networks.selectedNetwork !== null;
 export const selectPopupInfo = (state: RootState) => state.networks.popupInfo;
 export const selectSearchTerm = (state: RootState) => state.networks.searchTerm;
+export const selectIsControlOpen = (state: RootState) =>
+  state.networks.isControlOpen;
 
 export default networkSlice.reducer;

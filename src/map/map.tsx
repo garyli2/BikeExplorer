@@ -6,21 +6,27 @@ import Map, {
 } from "react-map-gl/maplibre";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Box, Paper } from "@mui/material";
+import { Box, Fab, Paper } from "@mui/material";
 import {
+  selectIsControlOpen,
   selectIsNetworkSelected,
   selectSelectedNetwork,
+  setIsControlOpen,
 } from "../store/networks";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import MapControl from "./map-control";
 import MapPopup from "./networks/network-popup";
 import MapPins from "./map-pins";
 import NetworkPopup from "./networks/network-popup";
 import StationPopup from "./stations/station-popup";
+import { useState } from "react";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export default function NetworkMap() {
   const selectedNetwork = useAppSelector(selectSelectedNetwork);
   const isNetworkSelected = useAppSelector(selectIsNetworkSelected);
+  const isControlOpen = useAppSelector(selectIsControlOpen);
+  const dispatch = useAppDispatch();
 
   return (
     <Box display="flex" flexGrow={1} height="100vh">
@@ -48,9 +54,20 @@ export default function NetworkMap() {
             right: 0,
           }}
         >
-          <Paper style={{ minWidth: "25vw", marginTop: 10, marginRight: 10 }}>
-            <MapControl />
-          </Paper>
+          {isControlOpen ? (
+            <Paper style={{ minWidth: "25vw", marginTop: 10, marginRight: 10 }}>
+              <MapControl />
+            </Paper>
+          ) : (
+            <Fab
+              variant="extended"
+              onClick={() => dispatch(setIsControlOpen(true))}
+              style={{ marginTop: 10, marginRight: 10 }}
+            >
+              <SettingsIcon sx={{ mr: 1 }} />
+              Map Control
+            </Fab>
+          )}
         </Box>
       </Map>
     </Box>
